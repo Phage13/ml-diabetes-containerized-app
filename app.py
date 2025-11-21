@@ -1,12 +1,11 @@
 from flask import Flask, render_template, request
 import joblib
-import numpy as np
 import pandas as pd
 
-# Create the Flask app instance
+# Create Flask app
 app = Flask(__name__)
 
-# Load your trained model
+# Load trained model (make sure this file exists in /models)
 model = joblib.load("models/best_diabetes_model.pkl")
 
 @app.route("/")
@@ -16,11 +15,13 @@ def index():
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
+        # Extract form inputs
         gender = int(request.form["gender"])
         age = float(request.form["age"])
         hypertension = int(request.form["hypertension"])
         heart_disease = int(request.form["heart_disease"])
 
+        # Encode categorical smoking history
         smoking_map = {
             "No Info": 0,
             "never": 1,
@@ -47,12 +48,14 @@ def predict():
             "blood_glucose_level": blood_glucose_level
         }])
 
-        # Force numeric types
-        input_df = input_df.apply(pd.to_numeric, errors="coerce")
+        # Force all columns to numeric types
+        input_df = input_df.astype(float)
 
+        # Debug logs to Heroku
         print("DEBUG input_df:", input_df.to_dict())
         print("DEBUG dtypes:", input_df.dtypes)
 
+        # Make prediction
         prediction = model.predict(input_df)[0]
         output = "Diabetes Detected" if prediction == 1 else "No Diabetes"
 
@@ -64,3 +67,4 @@ def predict():
 
 if __name__ == "__main__":
     app.run(debug=True)
+
