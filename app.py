@@ -21,7 +21,7 @@ def predict():
         hypertension = int(request.form["hypertension"])
         heart_disease = int(request.form["heart_disease"])
 
-        # Pass raw string for smoking_history (no integer mapping)
+        # Pass raw string for smoking_history (pipeline expects strings)
         smoking_history = request.form["smoking_history"]
 
         bmi = float(request.form["bmi"])
@@ -46,7 +46,9 @@ def predict():
 
         # Make prediction
         prediction = model.predict(input_df)[0]
-        output = "Diabetes Detected" if prediction == 1 else "No Diabetes"
+
+        # Updated output wording
+        output = "High Risk" if prediction == 1 else "Normal Risk"
 
         return render_template("index.html", prediction_text=output)
 
@@ -56,4 +58,3 @@ def predict():
 
 if __name__ == "__main__":
     app.run(debug=True)
-
