@@ -1,20 +1,6 @@
-from flask import Flask, render_template, request
-import joblib
-import numpy as np
-
-app = Flask(__name__)
-
-# Load your trained model (make sure this file exists in /models)
-model = joblib.load("models/best_diabetes_model.pkl")
-
-@app.route("/")
-def index():
-    return render_template("index.html")
-
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
-        # Extract form inputs
         gender = int(request.form["gender"])
         age = float(request.form["age"])
         hypertension = int(request.form["hypertension"])
@@ -39,15 +25,13 @@ def predict():
         features = [[gender, age, hypertension, heart_disease,
                      smoking_history, bmi, HbA1c_level, blood_glucose_level]]
 
-        # Make prediction
+        print("DEBUG features:", features)  # shows up in Heroku logs
+
         prediction = model.predict(features)[0]
         output = "Diabetes Detected" if prediction == 1 else "No Diabetes"
 
         return render_template("index.html", prediction_text=output)
 
     except Exception as e:
-        # Show error message in the template instead of crashing
+        print("ERROR in predict route:", str(e))
         return render_template("index.html", prediction_text=f"Error: {str(e)}")
-
-if __name__ == "__main__":
-    app.run(debug=True)
