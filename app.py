@@ -1,28 +1,22 @@
-name: Deploy Diabetes Prediction App
+from flask import Flask, render_template, request
+import joblib
+import numpy as np
 
-on:
-  push:
-    branches:
-      - main   
+app = Flask(__name__)
 
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+# Load your trained model
+model = joblib.load("models/best_diabetes_model.pkl")
 
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+@app.route("/")
+def index():
+    return render_template("index.html")
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: "3.11"   
+@app.route("/predict", methods=["POST"])
+def predict():
+    # Example: collect form inputs
+    data = [float(x) for x in request.form.values()]
+    prediction = model.predict([np.array(data)])
+    return render_template("index.html", prediction=prediction[0])
 
-      - name: Deploy to Heroku (Diabetes App)
-        uses: akhileshns/heroku-deploy@v3.12.12
-        with:
-          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: "ml-will-i-get-diabetes2-app"   
-          heroku_email: ${{ secrets.HEROKU_EMAIL }}
-          usedocker: true   
-          appdir: "C:/Users/Nanoo/OneDrive/Desktop/ANA-680/ml-diabetes-containerized-app"
+if __name__ == "__main__":
+    app.run(debug=True)
