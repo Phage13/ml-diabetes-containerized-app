@@ -1,10 +1,11 @@
 from flask import Flask, render_template, request
 import joblib
 import numpy as np
+import pandas as pd   # <-- added to support DataFrame input
 
 app = Flask(__name__)
 
-# Load your trained model
+# Load your trained model (make sure this file exists in /models)
 model = joblib.load("models/best_diabetes_model.pkl")
 
 @app.route("/")
@@ -14,6 +15,7 @@ def index():
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
+        # Extract form inputs
         gender = int(request.form["gender"])
         age = float(request.form["age"])
         hypertension = int(request.form["hypertension"])
@@ -34,13 +36,22 @@ def predict():
         HbA1c_level = float(request.form["HbA1c_level"])
         blood_glucose_level = float(request.form["blood_glucose_level"])
 
-        # Arrange features in the same order your model was trained on
-        features = [[gender, age, hypertension, heart_disease,
-                     smoking_history, bmi, HbA1c_level, blood_glucose_level]]
+        # Build DataFrame with same column names used in training
+        input_df = pd.DataFrame([{
+            "gender": gender,
+            "age": age,
+            "hypertension": hypertension,
+            "heart_disease": heart_disease,
+            "smoking_history": smoking_history,
+            "bmi": bmi,
+            "HbA1c_level": HbA1c_level,
+            "blood_glucose_level": blood_glucose_level
+        }])
 
-        print("DEBUG features:", features)  # shows up in Heroku logs
+        print("DEBUG input_df:", input_df.to_dict())  # shows up in Heroku logs
 
-        prediction = model.predict(features)[0]
+        # Predict using the model
+        prediction = model.predict(input_df)[0]
         output = "Diabetes Detected" if prediction == 1 else "No Diabetes"
 
         return render_template("index.html", prediction_text=output)
