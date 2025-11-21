@@ -1,27 +1,11 @@
-from flask import Flask, render_template, request
-import joblib
-import numpy as np
-import pandas as pd   # <-- added to support DataFrame input
-
-app = Flask(__name__)
-
-# Load your trained model (make sure this file exists in /models)
-model = joblib.load("models/best_diabetes_model.pkl")
-
-@app.route("/")
-def index():
-    return render_template("index.html")
-
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
-        # Extract form inputs
         gender = int(request.form["gender"])
         age = float(request.form["age"])
         hypertension = int(request.form["hypertension"])
         heart_disease = int(request.form["heart_disease"])
 
-        # Encode categorical smoking history
         smoking_map = {
             "No Info": 0,
             "never": 1,
@@ -30,13 +14,13 @@ def predict():
             "not current": 4,
             "ever": 5
         }
-        smoking_history = smoking_map[request.form["smoking_history"]]
+        smoking_history = smoking_map.get(request.form["smoking_history"], 0)
 
         bmi = float(request.form["bmi"])
         HbA1c_level = float(request.form["HbA1c_level"])
         blood_glucose_level = float(request.form["blood_glucose_level"])
 
-        # Build DataFrame with same column names used in training
+        # Build DataFrame with enforced numeric types
         input_df = pd.DataFrame([{
             "gender": gender,
             "age": age,
@@ -48,9 +32,12 @@ def predict():
             "blood_glucose_level": blood_glucose_level
         }])
 
-        print("DEBUG input_df:", input_df.to_dict())  # shows up in Heroku logs
+        # Force all columns to numeric
+        input_df = input_df.apply(pd.to_numeric, errors="coerce")
 
-        # Predict using the model
+        print("DEBUG input_df:", input_df.to_dict())
+        print("DEBUG dtypes:", input_df.dtypes)
+
         prediction = model.predict(input_df)[0]
         output = "Diabetes Detected" if prediction == 1 else "No Diabetes"
 
@@ -59,6 +46,3 @@ def predict():
     except Exception as e:
         print("ERROR in predict route:", str(e))
         return render_template("index.html", prediction_text=f"Error: {str(e)}")
-
-if __name__ == "__main__":
-    app.run(debug=True)
