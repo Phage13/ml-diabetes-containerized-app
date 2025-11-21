@@ -5,7 +5,7 @@ import pandas as pd
 # Create Flask app
 app = Flask(__name__)
 
-# Load trained model (make sure this file exists in /models)
+# Load trained model
 model = joblib.load("models/best_diabetes_model.pkl")
 
 @app.route("/")
@@ -49,7 +49,7 @@ def predict():
         }])
 
         # Force all columns to numeric types
-        input_df = input_df.astype(float)
+        input_df = input_df.apply(pd.to_numeric, errors="raise")
 
         # Debug logs to Heroku
         print("DEBUG input_df:", input_df.to_dict())
