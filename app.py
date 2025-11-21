@@ -1,3 +1,18 @@
+from flask import Flask, render_template, request
+import joblib
+import numpy as np
+import pandas as pd
+
+# Create the Flask app instance
+app = Flask(__name__)
+
+# Load your trained model
+model = joblib.load("models/best_diabetes_model.pkl")
+
+@app.route("/")
+def index():
+    return render_template("index.html")
+
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
@@ -20,7 +35,7 @@ def predict():
         HbA1c_level = float(request.form["HbA1c_level"])
         blood_glucose_level = float(request.form["blood_glucose_level"])
 
-        # Build DataFrame with enforced numeric types
+        # Build DataFrame with same column names used in training
         input_df = pd.DataFrame([{
             "gender": gender,
             "age": age,
@@ -32,7 +47,7 @@ def predict():
             "blood_glucose_level": blood_glucose_level
         }])
 
-        # Force all columns to numeric
+        # Force numeric types
         input_df = input_df.apply(pd.to_numeric, errors="coerce")
 
         print("DEBUG input_df:", input_df.to_dict())
@@ -46,3 +61,6 @@ def predict():
     except Exception as e:
         print("ERROR in predict route:", str(e))
         return render_template("index.html", prediction_text=f"Error: {str(e)}")
+
+if __name__ == "__main__":
+    app.run(debug=True)
