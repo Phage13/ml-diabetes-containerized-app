@@ -1,3 +1,16 @@
+from flask import Flask, render_template, request
+import joblib
+import numpy as np
+
+app = Flask(__name__)
+
+# Load your trained model
+model = joblib.load("models/best_diabetes_model.pkl")
+
+@app.route("/")
+def index():
+    return render_template("index.html")
+
 @app.route("/predict", methods=["POST"])
 def predict():
     try:
@@ -35,3 +48,6 @@ def predict():
     except Exception as e:
         print("ERROR in predict route:", str(e))
         return render_template("index.html", prediction_text=f"Error: {str(e)}")
+
+if __name__ == "__main__":
+    app.run(debug=True)
