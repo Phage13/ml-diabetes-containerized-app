@@ -22,6 +22,7 @@ jobs:
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
-          heroku_app_name: "diabetes-prediction-app"   # Replace with your actual Heroku app name
+          heroku_app_name: "ml-will-i-get-diabetes2-app"   
           heroku_email: ${{ secrets.HEROKU_EMAIL }}
-          usedocker: true   # Important: tells the action to deploy using Dockerfile
+          usedocker: true   
+          appdir: "."
