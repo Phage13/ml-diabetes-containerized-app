@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI‑Powered Diabetes Risk Predictor</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Simple CSS styling -->
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(to right, #f0f4f8, #d9e4ec);
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 700px;
+            margin: 50px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        form label {
+            font-weight: bold;
+            display: block;
+            margin-top: 15px;
+        }
+        form input, form select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+        form small {
+            color: #777;
+            font-size: 12px;
+        }
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .form-group img {
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+        }
+        input[type="submit"] {
+            background: #3498db;
+            color: #fff;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background 0.3s ease;
+        }
+        input[type="submit"]:hover {
+            background: #2980b9;
+        }
+        h3 {
+            text-align: center;
+            margin-top: 30px;
+            color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Enter Patient Data</h2>
+        <form action="/predict" method="post">
+
+            <div class="form-group">
+                <img src="https://img.icons8.com/color/48/000000/gender.png" alt="Gender Icon">
+                <div>
+                    <label>Gender:</label>
+                    <select name="gender">
+                        <option value="0">Female</option>
+                        <option value="1">Male</option>
+                    </select>
+                    <small>(0 = Female, 1 = Male)</small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <img src="https://img.icons8.com/color/48/000000/age.png" alt="Age Icon">
+                <div>
+                    <label>Age:</label>
+                    <input type="number" name="age" min="1" max="120" step="1">
+                    <small>(years, typical range 18–90)</small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <img src="https://img.icons8.com/color/48/000000/blood-pressure.png" alt="Hypertension Icon">
+                <div>
+                    <label>Hypertension:</label>
+                    <select name="hypertension">
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                    <small>(0 = No hypertension, 1 = Diagnosed hypertension)</small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <img src="https://img.icons8.com/color/48/000000/heart-health.png" alt="Heart Icon">
+                <div>
+                    <label>Heart Disease:</label>
+                    <select name="heart_disease">
+                        <option value="0">No</option>
+                        <option value="1">Yes</option>
+                    </select>
+                    <small>(0 = No heart disease, 1 = Diagnosed heart disease)</small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <img src="https://img.icons8.com/color/48/000000/no-smoking.png" alt="Smoking Icon">
+                <div>
+                    <label>Smoking History:</label>
+                    <select name="smoking_history">
+                        <option value="No Info">No Info</option>
+                        <option value="never">Never</option>
+                        <option value="former">Former</option>
+                        <option value="current">Current</option>
+                        <option value="not current">Not Current</option>
+                        <option value="ever">Ever</option>
+                    </select>
+                    <small>(Patient’s smoking status)</small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <img src="https://img.icons8.com/color/48/000000/scale.png" alt="BMI Icon">
+                <div>
+                    <label>BMI:</label>
+                    <input type="number" name="bmi" min="10" max="60" step="0.1">
+                    <small>(Normal 18.5–24.9, obesity ≥30)</small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <img src="https://img.icons8.com/color/48/000000/test-tube.png" alt="HbA1c Icon">
+                <div>
+                    <label>HbA1c Level (%):</label>
+                    <input type="number" name="HbA1c_level" min="3" max="15" step="0.1">
+                    <small>(Normal <5.7, prediabetes 5.7–6.4, diabetes ≥6.5)</small>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <img src="https://img.icons8.com/color/48/000000/sugar-cube.png" alt="Glucose Icon">
+                <div>
+                    <label>Blood Glucose Level (mg/dL):</label>
+                    <input type="number" name="blood_glucose_level" min="50" max="400" step="1">
+                    <small>(Normal fasting 70–99, diabetes ≥126)</small>
+                </div>
+            </div>
+
+            <input type="submit" value="Predict">
+        </form>
+
+        <h3>{{ prediction_text }}</h3>
+    </div>
+</body>
+</html>
